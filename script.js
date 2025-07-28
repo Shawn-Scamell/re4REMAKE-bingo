@@ -29,7 +29,6 @@ const challenges = {
     "Sell 3 different weapons",
     "Capture the Lunker Bass",
     // "Capture the Lord of the Waterway",
-    "Never use a key",
     "Craft a Full Necklace",
     "Watch any cutscene",
     "Die to Chainsaw Guy",
