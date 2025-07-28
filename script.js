@@ -24,7 +24,22 @@ const challenges = {
     "Craft a Full Crown (5 Colors)",
     "Avoid Killing Medieval Gigante",
     "Kill the Savage Mutt",
-    "Get Attacked by a Chicken"
+    "Get Attacked by a Chicken",
+    "Have 200,000 ptas at one time",
+    "Sell 3 different weapons",
+    "Capture the Lunker Bass",
+    // "Capture the Lord of the Waterway",
+    "Never use a key",
+    "Craft a Full Necklace",
+    "Watch any cutscene",
+    "Die to Chainsaw Guy",
+    "Get hit by a pig",
+    "Get hit by cow",
+    "Never use yellow herb in village",
+    "Kill Regenerator without Bioscope",
+    "Break 5 windows",
+    "Own 30 spinels at one time",
+    "Don't use rocket launcher in castle"
   ],
   ChatGPT: [
     "Kill 2 Enemies with One Grenade",
