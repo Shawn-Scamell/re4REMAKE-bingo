@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resident Evil 4 Bingo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Resident Evil 4 Bingo</h1>
+  <label for="sourceSelect">Challenge Source:</label>
+  <select id="sourceSelect">
+    <option value="Original">Original Only</option>
+    <option value="All">Original + Extras</option>
+  </select>
+  <button onclick="generateBoard()">Regenerate Board</button>
+  <div class="bingo-board" id="bingoBoard"></div>
+  <script src="script.js"></script>
+</body>
+</html>
