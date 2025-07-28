@@ -1,3 +1,4 @@
+
 const challenges = {
   Original: [
     "Enemy Kills Themself on Tripwire",
@@ -61,6 +62,19 @@ function shuffle(array) {
               .map(({ value }) => value);
 }
 
+function saveState(selected, source, markedIndices) {
+  localStorage.setItem('re4_bingo_board', JSON.stringify(selected));
+  localStorage.setItem('re4_bingo_source', source);
+  localStorage.setItem('re4_bingo_marked', JSON.stringify(markedIndices));
+}
+
+function loadState() {
+  const selected = JSON.parse(localStorage.getItem('re4_bingo_board') || '[]');
+  const source = localStorage.getItem('re4_bingo_source');
+  const marked = JSON.parse(localStorage.getItem('re4_bingo_marked') || '[]');
+  return { selected, source, marked };
+}
+
 function generateBoard() {
   const board = document.getElementById('bingoBoard');
   const source = document.getElementById('sourceSelect').value;
@@ -68,14 +82,38 @@ function generateBoard() {
   const pool = source === 'All' ? base.concat(challenges.ChatGPT) : base;
   const selected = shuffle(pool).slice(0, 25);
 
+  renderBoard(selected, source, []);
+}
+
+function renderBoard(selected, source, markedIndices) {
+  const board = document.getElementById('bingoBoard');
   board.innerHTML = '';
+  document.getElementById('sourceSelect').value = source;
+
   selected.forEach((text, i) => {
     const tile = document.createElement('div');
     tile.className = 'bingo-tile';
     tile.innerText = `${i + 1}. ${text}`;
-    tile.onclick = () => tile.classList.toggle('marked');
+    if (markedIndices.includes(i)) tile.classList.add('marked');
+
+    tile.onclick = () => {
+      tile.classList.toggle('marked');
+      const updatedMarked = [...document.querySelectorAll('.bingo-tile.marked')]
+        .map(el => parseInt(el.innerText.split('.')[0]) - 1);
+      saveState(selected, source, updatedMarked);
+    };
+
     board.appendChild(tile);
   });
+
+  saveState(selected, source, markedIndices);
 }
 
-window.onload = generateBoard;
+window.onload = () => {
+  const { selected, source, marked } = loadState();
+  if (selected.length === 25 && source) {
+    renderBoard(selected, source, marked);
+  } else {
+    generateBoard();
+  }
+};
