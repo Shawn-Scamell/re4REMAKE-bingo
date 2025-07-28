@@ -25,10 +25,10 @@
 
   <div class="bingo-board" id="bingoBoard"></div>
 
-  <script src="script.js"></script>
+<script type="module" src="./js/script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
+      navigator.serviceWorker.register('./js/service-worker.js')
         .then(() => console.log('Service Worker Registered'));
     }
   </script>
