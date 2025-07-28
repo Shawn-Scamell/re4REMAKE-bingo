@@ -148,42 +148,42 @@ function renderBoard(selected, source, markedIndices) {
   const selectedBy = JSON.parse(localStorage.getItem('re4_bingo_selectedBy') || '[]');
 
   selected.forEach((text, i) => {
-    const tile = document.createElement('div');
-    tile.className = 'bingo-tile';
-    tile.innerText = `${i + 1}. ${text}`;
-    if (markedIndices.includes(i)) {
-      tile.classList.add('marked');
-      const player = selectedBy[i];
-      if (player) {
-        tile.dataset.selectedBy = player;
-        tile.style.backgroundColor = players[player].color;
-        tile.style.borderColor = players[player].color;
-      }
+  const tile = document.createElement('div');
+  tile.className = 'bingo-tile';
+  tile.innerText = text; // Removed the number before the challenge title
+  if (markedIndices.includes(i)) {
+    tile.classList.add('marked');
+    const player = selectedBy[i];
+    if (player) {
+      tile.dataset.selectedBy = player;
+      tile.style.backgroundColor = players[player].color;
+      tile.style.borderColor = players[player].color;
+    }
+  }
+
+  tile.onclick = () => {
+    if (isMultiplayer && tile.dataset.selectedBy && tile.dataset.selectedBy !== currentPlayer.toString()) {
+      return; // Prevent overriding another player's selection in multiplayer mode
     }
 
-tile.onclick = () => {
-  if (isMultiplayer && tile.dataset.selectedBy && tile.dataset.selectedBy !== currentPlayer.toString()) {
-    return; // Prevent overriding another player's selection in multiplayer mode
-  }
+    tile.classList.toggle('marked');
+    if (tile.classList.contains('marked')) {
+      tile.dataset.selectedBy = currentPlayer;
+      tile.style.backgroundColor = players[currentPlayer].color;
+      tile.style.borderColor = players[currentPlayer].color;
+    } else {
+      tile.dataset.selectedBy = '';
+      tile.style.backgroundColor = '';
+      tile.style.borderColor = '#444';
+    }
 
-  tile.classList.toggle('marked');
-  if (tile.classList.contains('marked')) {
-    tile.dataset.selectedBy = currentPlayer;
-    tile.style.backgroundColor = players[currentPlayer].color;
-    tile.style.borderColor = players[currentPlayer].color;
-  } else {
-    tile.dataset.selectedBy = '';
-    tile.style.backgroundColor = '';
-    tile.style.borderColor = '#444';
-  }
+    const updatedMarked = [...document.querySelectorAll('.bingo-tile.marked')]
+      .map(el => parseInt(el.innerText.split('.')[0]) - 1);
+    saveState(selected, source, updatedMarked);
+  };
 
-  const updatedMarked = [...document.querySelectorAll('.bingo-tile.marked')]
-    .map(el => parseInt(el.innerText.split('.')[0]) - 1);
-  saveState(selected, source, updatedMarked);
-};
-
-    board.appendChild(tile);
-  });
+  board.appendChild(tile);
+});
 
   saveState(selected, source, markedIndices);
 }
