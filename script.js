@@ -147,23 +147,26 @@ function renderBoard(selected, source, markedIndices) {
       }
     }
 
-    tile.onclick = () => {
-      if (isMultiplayer && tile.dataset.selectedBy) return;
-      tile.classList.toggle('marked');
-      if (tile.classList.contains('marked')) {
-        tile.dataset.selectedBy = currentPlayer;
-        tile.style.backgroundColor = players[currentPlayer].color;
-        tile.style.borderColor = players[currentPlayer].color;
-      } else {
-        tile.dataset.selectedBy = '';
-        tile.style.backgroundColor = '';
-        tile.style.borderColor = '#444';
-      }
+tile.onclick = () => {
+  if (isMultiplayer && tile.dataset.selectedBy && tile.dataset.selectedBy !== currentPlayer.toString()) {
+    return; // Prevent overriding another player's selection in multiplayer mode
+  }
 
-      const updatedMarked = [...document.querySelectorAll('.bingo-tile.marked')]
-        .map(el => parseInt(el.innerText.split('.')[0]) - 1);
-      saveState(selected, source, updatedMarked);
-    };
+  tile.classList.toggle('marked');
+  if (tile.classList.contains('marked')) {
+    tile.dataset.selectedBy = currentPlayer;
+    tile.style.backgroundColor = players[currentPlayer].color;
+    tile.style.borderColor = players[currentPlayer].color;
+  } else {
+    tile.dataset.selectedBy = '';
+    tile.style.backgroundColor = '';
+    tile.style.borderColor = '#444';
+  }
+
+  const updatedMarked = [...document.querySelectorAll('.bingo-tile.marked')]
+    .map(el => parseInt(el.innerText.split('.')[0]) - 1);
+  saveState(selected, source, updatedMarked);
+};
 
     board.appendChild(tile);
   });
