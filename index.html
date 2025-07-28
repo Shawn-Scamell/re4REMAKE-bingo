@@ -14,8 +14,17 @@
     <option value="Original">Original Only</option>
     <option value="All">Original + Extras</option>
   </select>
-  <button onclick="generateBoard()">Regenerate Board</button>
+  <button id="regenerateBoard">Regenerate Board</button>
+
+  <!-- Multiplayer Controls -->
+  <div id="multiplayerControls">
+    <button id="toggleMode">Toggle Solo/Multiplayer</button>
+    <p id="status">Solo Mode</p>
+    <button id="switchPlayer" style="display: none;">Switch Player</button>
+  </div>
+
   <div class="bingo-board" id="bingoBoard"></div>
+
   <script src="script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

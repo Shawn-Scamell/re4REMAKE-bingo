@@ -1,4 +1,3 @@
-
 const challenges = {
   Original: [
     "Enemy Kills Themself on Tripwire",
@@ -56,6 +55,13 @@ const challenges = {
   ]
 };
 
+let isMultiplayer = false;
+let currentPlayer = 1;
+const players = {
+  1: { name: "Player 1", color: "#11ff00" },
+  2: { name: "Player 2", color: "#dc3545" }
+};
+
 function shuffle(array) {
   return array.map(value => ({ value, sort: Math.random() }))
               .sort((a, b) => a.sort - b.sort)
@@ -63,20 +69,55 @@ function shuffle(array) {
 }
 
 function saveState(selected, source, markedIndices) {
+  const selectedBy = [...document.querySelectorAll('.bingo-tile')].map(tile => tile.dataset.selectedBy || null);
   localStorage.setItem('re4_bingo_board', JSON.stringify(selected));
   localStorage.setItem('re4_bingo_source', source);
   localStorage.setItem('re4_bingo_marked', JSON.stringify(markedIndices));
+  localStorage.setItem('re4_bingo_selectedBy', JSON.stringify(selectedBy));
+  localStorage.setItem('re4_bingo_multiplayer', JSON.stringify(isMultiplayer));
+  localStorage.setItem('re4_bingo_currentPlayer', currentPlayer);
+  localStorage.setItem('re4_bingo_players', JSON.stringify(players));
 }
 
 function loadState() {
   const selected = JSON.parse(localStorage.getItem('re4_bingo_board') || '[]');
   const source = localStorage.getItem('re4_bingo_source');
   const marked = JSON.parse(localStorage.getItem('re4_bingo_marked') || '[]');
+  isMultiplayer = JSON.parse(localStorage.getItem('re4_bingo_multiplayer') || 'false');
+  currentPlayer = parseInt(localStorage.getItem('re4_bingo_currentPlayer') || '1');
+  const savedPlayers = JSON.parse(localStorage.getItem('re4_bingo_players') || '{}');
+  if (Object.keys(savedPlayers).length > 0) {
+    Object.assign(players, savedPlayers);
+  }
   return { selected, source, marked };
 }
 
+function toggleMode() {
+  isMultiplayer = !isMultiplayer;
+  const switchPlayerButton = document.getElementById('switchPlayer');
+  if (isMultiplayer) {
+    players[1].name = prompt("Enter Player 1 name:", "Player 1") || "Player 1";
+    players[2].name = prompt("Enter Player 2 name:", "Player 2") || "Player 2";
+    switchPlayerButton.style.display = 'inline-block';
+  } else {
+    currentPlayer = 1;
+    switchPlayerButton.style.display = 'none';
+  }
+  updateStatus();
+}
+
+function updateStatus() {
+  const status = document.getElementById('status');
+  if (isMultiplayer) {
+    status.textContent = `${players[currentPlayer].name}'s Turn`;
+    status.style.color = players[currentPlayer].color;
+  } else {
+    status.textContent = "Solo Mode";
+    status.style.color = "#28a745";
+  }
+}
+
 function generateBoard() {
-  const board = document.getElementById('bingoBoard');
   const source = document.getElementById('sourceSelect').value;
   const base = [...challenges.Original];
   const pool = source === 'All' ? base.concat(challenges.ChatGPT) : base;
@@ -90,14 +131,35 @@ function renderBoard(selected, source, markedIndices) {
   board.innerHTML = '';
   document.getElementById('sourceSelect').value = source;
 
+  const selectedBy = JSON.parse(localStorage.getItem('re4_bingo_selectedBy') || '[]');
+
   selected.forEach((text, i) => {
     const tile = document.createElement('div');
     tile.className = 'bingo-tile';
     tile.innerText = `${i + 1}. ${text}`;
-    if (markedIndices.includes(i)) tile.classList.add('marked');
+    if (markedIndices.includes(i)) {
+      tile.classList.add('marked');
+      const player = selectedBy[i];
+      if (player) {
+        tile.dataset.selectedBy = player;
+        tile.style.backgroundColor = players[player].color;
+        tile.style.borderColor = players[player].color;
+      }
+    }
 
     tile.onclick = () => {
+      if (isMultiplayer && tile.dataset.selectedBy) return;
       tile.classList.toggle('marked');
+      if (tile.classList.contains('marked')) {
+        tile.dataset.selectedBy = currentPlayer;
+        tile.style.backgroundColor = players[currentPlayer].color;
+        tile.style.borderColor = players[currentPlayer].color;
+      } else {
+        tile.dataset.selectedBy = '';
+        tile.style.backgroundColor = '';
+        tile.style.borderColor = '#444';
+      }
+
       const updatedMarked = [...document.querySelectorAll('.bingo-tile.marked')]
         .map(el => parseInt(el.innerText.split('.')[0]) - 1);
       saveState(selected, source, updatedMarked);
@@ -109,11 +171,33 @@ function renderBoard(selected, source, markedIndices) {
   saveState(selected, source, markedIndices);
 }
 
+function switchPlayer() {
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
+  updateStatus();
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'Space') {
+    event.preventDefault();
+    if (isMultiplayer) {
+      switchPlayer();
+    }
+  }
+});
+
+document.getElementById('toggleMode').addEventListener('click', toggleMode);
+document.getElementById('regenerateBoard').addEventListener('click', generateBoard);
+document.getElementById('switchPlayer').addEventListener('click', switchPlayer);
+
 window.onload = () => {
-  const { selected, source, marked } = loadState();
-  if (selected.length === 25 && source) {
-    renderBoard(selected, source, marked);
+  const savedState = loadState();
+  if (savedState.selected.length === 25 && savedState.source) {
+    renderBoard(savedState.selected, savedState.source, savedState.marked);
   } else {
     generateBoard();
   }
+  updateStatus();
+
+  const switchPlayerButton = document.getElementById('switchPlayer');
+  switchPlayerButton.style.display = isMultiplayer ? 'inline-block' : 'none';
 };

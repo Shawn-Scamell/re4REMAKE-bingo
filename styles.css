@@ -40,89 +40,28 @@ select, button {
   text-decoration: line-through;
 }
 
-  .bingo-tile {
-    font-size: 0.9rem;
-    padding: 1.2rem 0.5rem;
-    min-height: 80px;
-  }
-
-  select, button {
-    width: 80%;
-    max-width: 300px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
+#multiplayerControls {
+  margin: 1rem auto;
+  text-align: center;
 }
 
-
-  .bingo-tile {
-    font-size: 0.9rem;
-    min-height: 70px;
-  }
+#status {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  color: #eee;
+  font-weight: bold;
 }
 
-
-  .bingo-tile {
-    font-size: 0.8rem;
-    padding: 0.8rem 0.4rem;
-    min-height: 60px;
-  }
-
-  select, button {
-    width: 100%;
-    max-width: 320px;
-    font-size: 1rem;
-  }
-
-  h1 {
-    font-size: 1.4rem;
-  }
+.bingo-tile[data-selected-by="1"] {
+  background: #11ff00;
+  color: #fff;
 }
 
-
-  .bingo-tile {
-    font-size: 0.7rem;
-    padding: 0.6rem 0.3rem;
-    min-height: 50px;
-  }
+.bingo-tile[data-selected-by="2"] {
+  background: #dc3545;
+  color: #fff;
 }
 
-
-  h1 {
-    font-size: 1.3rem;
-  }
-}
-
-
-  h1 {
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .bingo-tile {
-    font-size: 0.75rem;
-    padding: 0.6rem 0.4rem;
-    min-height: 60px;
-    word-break: break-word;
-  }
-
-  h1 {
-    font-size: 1.3rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .bingo-tile {
-    font-size: 0.65rem;
-    padding: 0.5rem 0.3rem;
-    min-height: 50px;
-    word-break: break-word;
-  }
-
-  h1 {
-    font-size: 1.1rem;
-  }
+.bingo-tile {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
