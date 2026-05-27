@@ -1,67 +1,204 @@
-body {
-  font-family: sans-serif;
-  background: #111;
-  color: #eee;
-  text-align: center;
-  padding: 2rem;
+:root {
+  --bg: #111;
+  --surface: #1e1e1e;
+  --tile-bg: #222;
+  --tile-border: #444;
+  --text: #eee;
+  --player1: #11ff00;
+  --player2: #dc3545;
+  --marked: #0a0;
 }
 
-select, button {
-  margin: 1rem;
-  padding: 0.5rem;
-  font-size: 1rem;
+*, *::before, *::after {
+  box-sizing: border-box;
 }
+
+body {
+  font-family: sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  min-height: 100svh;
+}
+
+h1 {
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  margin: 0.25rem 0 0.75rem;
+}
+
+/* ── Controls ─────────────────────────────── */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: clamp(0.85rem, 3vw, 1rem);
+}
+
+select,
+button,
+input[type="text"] {
+  padding: 0.5rem 0.75rem;
+  font-size: clamp(0.85rem, 3vw, 1rem);
+  border-radius: 6px;
+  border: 1px solid var(--tile-border);
+  background: var(--surface);
+  color: var(--text);
+  min-height: 44px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+input[type="text"] {
+  cursor: text;
+  width: clamp(90px, 25vw, 130px);
+}
+
+button {
+  transition: background 0.15s;
+}
+
+button:hover {
+  background: #333;
+}
+
+button:active {
+  background: #444;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid #888;
+  outline-offset: 2px;
+}
+
+.player-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#status {
+  font-size: clamp(0.95rem, 3.5vw, 1.2rem);
+  margin: 0.1rem 0;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* ── Win banner ───────────────────────────── */
+
+.win-banner {
+  background: #8b0000;
+  color: #fff;
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  font-weight: bold;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  max-width: 900px;
+  margin: 0 auto 0.75rem;
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(0.93); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+/* ── Board ────────────────────────────────── */
 
 .bingo-board {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: clamp(4px, 1vw, 8px);
   max-width: 900px;
-  margin: 2rem auto;
+  width: 100%;
+  margin: 0 auto;
 }
 
+/* ── Tiles ────────────────────────────────── */
+
 .bingo-tile {
-  background: #222;
-  padding: 1rem;
-  border: 2px solid #444;
-  border-radius: 8px;
-  cursor: pointer;
-  min-height: 100px;
+  background: var(--tile-bg);
+  border: 2px solid var(--tile-border);
+  border-radius: 6px;
+  padding: clamp(0.3rem, 1.2vw, 0.9rem);
+  min-height: clamp(65px, 17vw, 115px);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  transition: all 0.2s ease;
+  font-size: clamp(0.6rem, 1.9vw, 0.85rem);
+  line-height: 1.35;
+  word-break: break-word;
+  hyphens: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.bingo-tile:hover {
+  border-color: #666;
+}
+
+.bingo-tile:active {
+  transform: scale(0.96);
 }
 
 .bingo-tile.marked {
-  background: #0a0;
+  background: var(--marked);
+  border-color: var(--marked);
   color: #fff;
   text-decoration: line-through;
 }
 
-#multiplayerControls {
-  margin: 1rem auto;
-  text-align: center;
-}
-
-#status {
-  font-size: 1.2rem;
-  margin-top: 0.5rem;
-  color: #eee;
-  font-weight: bold;
-}
-
 .bingo-tile[data-selected-by="1"] {
-  background: #11ff00;
-  color: #fff;
+  background: var(--player1);
+  border-color: var(--player1);
+  color: #000;
 }
 
 .bingo-tile[data-selected-by="2"] {
-  background: #dc3545;
+  background: var(--player2);
+  border-color: var(--player2);
   color: #fff;
 }
 
-.bingo-tile {
-  transition: background-color 0.3s ease, color 0.3s ease;
+.bingo-tile.bingo-line {
+  box-shadow: 0 0 0 3px gold;
+}
+
+/* ── Very small screens ───────────────────── */
+
+@media (max-width: 360px) {
+  body {
+    padding: 0.6rem;
+  }
+
+  .bingo-board {
+    gap: 3px;
+  }
 }

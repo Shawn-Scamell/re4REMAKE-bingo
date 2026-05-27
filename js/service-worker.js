@@ -1,4 +1,4 @@
-const cacheName = 're4-bingo-v2';
+const cacheName = 're4-bingo-v3';
 const filesToCache = [
   './',
   './index.html',
