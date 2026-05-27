@@ -15,7 +15,7 @@ export const challenges = {
     "Kill Ashley",
     "Complete 5 Merchant Requests",
     "Complete an Entire Chapter Without Reloading (Not Ashley)",
-    "Kill an Enemy with a Harpoon (Not DelLago)",
+    "Kill an Enemy with a Harpoon (Not Del Lago)",
     "Throw a Golden Egg at Ashley",
     "Kill a Boss with only the Bolt-Thrower",
     "Complete an Entire Chapter Without Picking Anything Up (Not Ashley – Excludes Key Items)",
