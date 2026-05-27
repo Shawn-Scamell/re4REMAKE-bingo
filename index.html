@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#181210">
+  <!-- Apply saved theme before CSS loads to prevent flash -->
+  <script>
+    document.documentElement.dataset.theme =
+      localStorage.getItem('re4_bingo_theme') || 'dark';
+  </script>
   <title>Resident Evil 4 Bingo</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
@@ -19,6 +24,7 @@
           <option value="All">Original + Extras</option>
         </select>
         <button id="regenerateBoard">Regenerate</button>
+        <button id="themeToggle">Light Mode</button>
       </div>
       <div class="control-row">
         <button id="toggleMode">Solo / Multiplayer</button>

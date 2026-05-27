@@ -4,9 +4,17 @@ let isMultiplayer = false;
 let currentPlayer = 1;
 let currentSelected = [];
 let currentSource = 'Original';
+
+// These colors are only for the status bar text — tile colors come from CSS variables.
+// Two sets so the status text is legible in both themes.
+const PLAYER_COLORS = {
+  dark:  { 1: '#8aaa68', 2: '#cc5050' },
+  light: { 1: '#3a5020', 2: '#7a2018' },
+};
+
 const players = {
-  1: { name: 'Player 1', color: '#11ff00' },
-  2: { name: 'Player 2', color: '#dc3545' },
+  1: { name: 'Player 1' },
+  2: { name: 'Player 2' },
 };
 
 const WINNING_LINES = [
@@ -14,6 +22,14 @@ const WINNING_LINES = [
   [0,5,10,15,20], [1,6,11,16,21], [2,7,12,17,22], [3,8,13,18,23], [4,9,14,19,24],
   [0,6,12,18,24], [4,8,12,16,20],
 ];
+
+function currentTheme() {
+  return document.documentElement.dataset.theme || 'dark';
+}
+
+function playerColor(p) {
+  return PLAYER_COLORS[currentTheme()][p];
+}
 
 function shuffle(array) {
   return array
@@ -28,22 +44,22 @@ function saveState() {
     .filter(t => t.classList.contains('marked'))
     .map(t => parseInt(t.dataset.index));
   const selectedBy = tiles.map(t => t.dataset.selectedBy || null);
-  localStorage.setItem('re4_bingo_board', JSON.stringify(currentSelected));
-  localStorage.setItem('re4_bingo_source', currentSource);
-  localStorage.setItem('re4_bingo_marked', JSON.stringify(markedIndices));
-  localStorage.setItem('re4_bingo_selectedBy', JSON.stringify(selectedBy));
-  localStorage.setItem('re4_bingo_multiplayer', JSON.stringify(isMultiplayer));
+  localStorage.setItem('re4_bingo_board',        JSON.stringify(currentSelected));
+  localStorage.setItem('re4_bingo_source',       currentSource);
+  localStorage.setItem('re4_bingo_marked',       JSON.stringify(markedIndices));
+  localStorage.setItem('re4_bingo_selectedBy',   JSON.stringify(selectedBy));
+  localStorage.setItem('re4_bingo_multiplayer',  JSON.stringify(isMultiplayer));
   localStorage.setItem('re4_bingo_currentPlayer', currentPlayer);
-  localStorage.setItem('re4_bingo_players', JSON.stringify(players));
+  localStorage.setItem('re4_bingo_players',      JSON.stringify(players));
 }
 
 function loadState() {
-  const selected = JSON.parse(localStorage.getItem('re4_bingo_board') || '[]');
-  const source = localStorage.getItem('re4_bingo_source');
-  const marked = JSON.parse(localStorage.getItem('re4_bingo_marked') || '[]');
+  const selected   = JSON.parse(localStorage.getItem('re4_bingo_board')   || '[]');
+  const source     = localStorage.getItem('re4_bingo_source');
+  const marked     = JSON.parse(localStorage.getItem('re4_bingo_marked')   || '[]');
   const selectedBy = JSON.parse(localStorage.getItem('re4_bingo_selectedBy') || '[]');
-  isMultiplayer = JSON.parse(localStorage.getItem('re4_bingo_multiplayer') || 'false');
-  currentPlayer = parseInt(localStorage.getItem('re4_bingo_currentPlayer') || '1');
+  isMultiplayer  = JSON.parse(localStorage.getItem('re4_bingo_multiplayer') || 'false');
+  currentPlayer  = parseInt(localStorage.getItem('re4_bingo_currentPlayer') || '1');
   const savedPlayers = JSON.parse(localStorage.getItem('re4_bingo_players') || '{}');
   if (Object.keys(savedPlayers).length > 0) Object.assign(players, savedPlayers);
   return { selected, source, marked, selectedBy };
@@ -53,11 +69,16 @@ function updateStatus() {
   const status = document.getElementById('status');
   if (isMultiplayer) {
     status.textContent = `${players[currentPlayer].name}'s Turn`;
-    status.style.color = players[currentPlayer].color;
+    status.style.color = playerColor(currentPlayer);
   } else {
     status.textContent = 'Solo Mode';
-    status.style.color = '#28a745';
+    status.style.color = ''; // handled by CSS --status-solo
   }
+}
+
+function updateThemeButton() {
+  document.getElementById('themeToggle').textContent =
+    currentTheme() === 'dark' ? 'Dark Mode' : 'Light Mode';
 }
 
 function updateNamesSummary() {
@@ -151,7 +172,7 @@ function generateBoard() {
 
 function renderBoard(selected, source, markedIndices, selectedBy = []) {
   currentSelected = selected;
-  currentSource = source;
+  currentSource   = source;
 
   const board = document.getElementById('bingoBoard');
   board.innerHTML = '';
@@ -166,12 +187,7 @@ function renderBoard(selected, source, markedIndices, selectedBy = []) {
     if (markedIndices.includes(i)) {
       tile.classList.add('marked');
       const player = selectedBy[i];
-      if (player) {
-        tile.dataset.selectedBy = player;
-        tile.style.backgroundColor = players[player].color;
-        tile.style.borderColor = players[player].color;
-        if (player === '1') tile.style.color = '#000';
-      }
+      if (player) tile.dataset.selectedBy = player; // CSS variables handle the color
     }
 
     tile.addEventListener('click', () => {
@@ -184,18 +200,11 @@ function renderBoard(selected, source, markedIndices, selectedBy = []) {
 
       if (tile.classList.contains('marked')) {
         tile.dataset.selectedBy = currentPlayer;
-        tile.style.backgroundColor = players[currentPlayer].color;
-        tile.style.borderColor = players[currentPlayer].color;
-        tile.style.color = currentPlayer === 1 ? '#000' : '#fff';
       } else {
         delete tile.dataset.selectedBy;
-        tile.style.backgroundColor = '';
-        tile.style.borderColor = '';
-        tile.style.color = '';
       }
 
       saveState();
-
       const win = checkWin();
       if (win) announceWin(win);
     });
@@ -205,6 +214,8 @@ function renderBoard(selected, source, markedIndices, selectedBy = []) {
 
   saveState();
 }
+
+// ── Event listeners ─────────────────────────
 
 document.addEventListener('keydown', e => {
   if (e.code === 'Space' && isMultiplayer) {
@@ -226,13 +237,24 @@ document.getElementById('applyNames').addEventListener('click', () => {
   saveState();
 });
 
-// Auto-size inputs as the user types
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('re4_bingo_theme', next);
+  updateThemeButton();
+  updateStatus(); // re-apply status colour for new theme
+});
+
 ['player1Name', 'player2Name'].forEach(id => {
   const input = document.getElementById(id);
   input.addEventListener('input', () => autosizeInput(input));
 });
 
+// ── Init ────────────────────────────────────
+
 window.addEventListener('load', () => {
+  updateThemeButton();
+
   const saved = loadState();
   if (saved.selected.length === 25 && saved.source) {
     renderBoard(saved.selected, saved.source, saved.marked, saved.selectedBy);

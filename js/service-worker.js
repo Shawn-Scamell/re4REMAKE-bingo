@@ -1,4 +1,4 @@
-const cacheName = 're4-bingo-v3';
+const cacheName = 're4-bingo-v5';
 const filesToCache = [
   './',
   './index.html',
@@ -6,7 +6,8 @@ const filesToCache = [
   './js/challenges.js',
   './js/script.js',
   './manifest.json',
-  './favicon.ico'
+  './favicon.ico',
+  './fonts/Virgula Vulgaris Bold.ttf'
 ];
 
 self.addEventListener('install', event => {

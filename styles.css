@@ -1,12 +1,51 @@
+@font-face {
+  font-family: 'VirgulaVulgaris';
+  src: url('./fonts/Virgula Vulgaris Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-display: swap;
+}
+
+/* ── RE4 village palette ───────────────────────────────────────────────
+   Swatches (L→R): near-black · dark brown · olive · maroon ·
+                   warm brown · caramel · wheat · stone
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Dark (default) */
 :root {
-  --bg: #111;
-  --surface: #1e1e1e;
-  --tile-bg: #222;
-  --tile-border: #444;
-  --text: #eee;
-  --player1: #11ff00;
-  --player2: #dc3545;
-  --marked: #0a0;
+  --bg:                #181210;
+  --surface:           #2c1c12;
+  --tile-bg:           #231810;
+  --tile-border:       #4e3220;
+  --tile-border-hover: #7a5038;
+  --text:              #c8b080;   /* warm wheat — ~9:1 on bg, no halation */
+  --player1:           #4a5c38;   /* muted olive */
+  --player2:           #7e2820;   /* maroon */
+  --marked:            #3a4e28;   /* deep olive */
+  --status-solo:       #b87c50;   /* caramel */
+  --win-bg:            #6e2020;
+  --btn-hover:         #3c2818;
+  --btn-active:        #4e3020;
+  --shadow:            rgba(0, 0, 0, 0.65);
+  --focus-ring:        #8a6040;
+}
+
+/* Light — parchment/daytime */
+[data-theme="light"] {
+  --bg:                #c8a85a;
+  --surface:           #b89448;
+  --tile-bg:           #ede4b0;   /* cream parchment — lifts contrast with dark text */
+  --tile-border:       #8a6030;
+  --tile-border-hover: #4a3820;
+  --text:              #1c1a14;   /* neutral dark, less warm — reduces colour vibration */
+  --player1:           #38501e;
+  --player2:           #6e2018;
+  --marked:            #384a1e;
+  --status-solo:       #5a3818;
+  --win-bg:            #6e2018;
+  --btn-hover:         #b09060;
+  --btn-active:        #a08050;
+  --shadow:            rgba(0, 0, 0, 0.25);
+  --focus-ring:        #5a3818;
 }
 
 *, *::before, *::after {
@@ -21,14 +60,16 @@ body {
   padding: 1rem;
   margin: 0;
   min-height: 100svh;
+  transition: background 0.3s, color 0.3s;
 }
 
 h1 {
+  font-family: 'VirgulaVulgaris', sans-serif;
   font-size: clamp(1.2rem, 5vw, 2rem);
   margin: 0.25rem 0 0.75rem;
 }
 
-/* ── Controls ─────────────────────────────── */
+/* ── Controls ──────────────────────────────── */
 
 .controls {
   display: flex;
@@ -62,33 +103,24 @@ input[type="text"] {
   min-height: 44px;
   cursor: pointer;
   touch-action: manipulation;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 input[type="text"] {
   cursor: text;
-  width: clamp(90px, 25vw, 130px);
 }
 
-button {
-  transition: background 0.15s;
-}
-
-button:hover {
-  background: #333;
-}
-
-button:active {
-  background: #444;
-}
+button:hover  { background: var(--btn-hover); }
+button:active { background: var(--btn-active); }
 
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
-  outline: 2px solid #888;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-/* ── Player names dropdown ────────────────── */
+/* ── Player names dropdown ─────────────────── */
 
 #playerNamesDetails {
   position: relative;
@@ -123,11 +155,8 @@ input:focus-visible {
   padding-left: 0.4rem;
 }
 
-#playerNamesDetails[open] summary::after {
-  transform: rotate(-180deg);
-}
-
-#playerNamesDetails summary:hover { background: #333; }
+#playerNamesDetails[open] summary::after { transform: rotate(-180deg); }
+#playerNamesDetails summary:hover { background: var(--btn-hover); }
 
 .player-names-panel {
   position: absolute;
@@ -143,7 +172,7 @@ input:focus-visible {
   flex-wrap: nowrap;
   gap: 0.5rem;
   align-items: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 6px 20px var(--shadow);
   white-space: nowrap;
 }
 
@@ -152,22 +181,22 @@ input:focus-visible {
   width: auto;
 }
 
-.hidden {
-  display: none !important;
-}
+/* ── Misc ──────────────────────────────────── */
+
+.hidden { display: none !important; }
 
 #status {
   font-size: clamp(0.95rem, 3.5vw, 1.2rem);
   margin: 0.1rem 0;
   font-weight: bold;
-  color: var(--text);
+  color: var(--status-solo);
 }
 
-/* ── Win banner ───────────────────────────── */
+/* ── Win banner ────────────────────────────── */
 
 .win-banner {
-  background: #8b0000;
-  color: #fff;
+  background: var(--win-bg);
+  color: #f0d898;
   font-size: clamp(1rem, 4vw, 1.4rem);
   font-weight: bold;
   padding: 0.65rem 1rem;
@@ -182,7 +211,7 @@ input:focus-visible {
   to   { transform: scale(1);    opacity: 1; }
 }
 
-/* ── Board ────────────────────────────────── */
+/* ── Board ─────────────────────────────────── */
 
 .bingo-board {
   display: grid;
@@ -193,7 +222,7 @@ input:focus-visible {
   margin: 0 auto;
 }
 
-/* ── Tiles ────────────────────────────────── */
+/* ── Tiles ─────────────────────────────────── */
 
 .bingo-tile {
   background: var(--tile-bg);
@@ -205,6 +234,7 @@ input:focus-visible {
   align-items: center;
   justify-content: center;
   text-align: center;
+  font-family: 'VirgulaVulgaris', sans-serif;
   font-size: clamp(0.6rem, 1.9vw, 0.85rem);
   line-height: 1.35;
   word-break: break-word;
@@ -213,48 +243,39 @@ input:focus-visible {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, transform 0.1s ease;
 }
 
-.bingo-tile:hover {
-  border-color: #666;
-}
-
-.bingo-tile:active {
-  transform: scale(0.96);
-}
+.bingo-tile:hover  { border-color: var(--tile-border-hover); }
+.bingo-tile:active { transform: scale(0.96); }
 
 .bingo-tile.marked {
   background: var(--marked);
   border-color: var(--marked);
-  color: #fff;
+  color: #e8d898;
   text-decoration: line-through;
 }
 
 .bingo-tile[data-selected-by="1"] {
   background: var(--player1);
   border-color: var(--player1);
-  color: #000;
+  color: #e8d898;
 }
 
 .bingo-tile[data-selected-by="2"] {
   background: var(--player2);
   border-color: var(--player2);
-  color: #fff;
+  color: #e8d898;
 }
 
 .bingo-tile.bingo-line {
-  box-shadow: 0 0 0 3px gold;
+  box-shadow: 0 0 0 3px #d4b870;
 }
 
-/* ── Very small screens ───────────────────── */
+/* ── Very small screens ────────────────────── */
 
 @media (max-width: 360px) {
-  body {
-    padding: 0.6rem;
-  }
-
-  .bingo-board {
-    gap: 3px;
-  }
+  body { padding: 0.6rem; }
+  .bingo-board { gap: 3px; }
 }
