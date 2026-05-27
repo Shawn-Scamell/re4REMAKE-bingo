@@ -88,12 +88,68 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-.player-names {
+/* ── Player names dropdown ────────────────── */
+
+#playerNamesDetails {
+  position: relative;
+  display: inline-block;
+}
+
+#playerNamesDetails summary {
+  list-style: none;
+  padding: 0.5rem 0.75rem;
+  font-size: clamp(0.85rem, 3vw, 1rem);
+  border-radius: 6px;
+  border: 1px solid var(--tile-border);
+  background: var(--surface);
+  color: var(--text);
+  min-height: 44px;
+  cursor: pointer;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.15s;
+}
+
+#playerNamesDetails summary::-webkit-details-marker { display: none; }
+
+#playerNamesDetails summary::after {
+  content: '▾';
+  font-size: 0.8em;
+  transition: transform 0.2s;
+  margin-left: auto;
+  padding-left: 0.4rem;
+}
+
+#playerNamesDetails[open] summary::after {
+  transform: rotate(-180deg);
+}
+
+#playerNamesDetails summary:hover { background: #333; }
+
+.player-names-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  background: var(--surface);
+  border: 1px solid var(--tile-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   align-items: center;
-  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.player-names-panel input[type="text"] {
+  min-width: 4ch;
+  width: auto;
 }
 
 .hidden {

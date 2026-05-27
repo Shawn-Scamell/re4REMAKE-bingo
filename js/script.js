@@ -2,6 +2,8 @@ import { challenges } from './challenges.js';
 
 let isMultiplayer = false;
 let currentPlayer = 1;
+let currentSelected = [];
+let currentSource = 'Original';
 const players = {
   1: { name: 'Player 1', color: '#11ff00' },
   2: { name: 'Player 2', color: '#dc3545' },
@@ -20,11 +22,14 @@ function shuffle(array) {
     .map(({ value }) => value);
 }
 
-function saveState(selected, source, markedIndices) {
+function saveState() {
   const tiles = [...document.querySelectorAll('.bingo-tile')];
+  const markedIndices = tiles
+    .filter(t => t.classList.contains('marked'))
+    .map(t => parseInt(t.dataset.index));
   const selectedBy = tiles.map(t => t.dataset.selectedBy || null);
-  localStorage.setItem('re4_bingo_board', JSON.stringify(selected));
-  localStorage.setItem('re4_bingo_source', source);
+  localStorage.setItem('re4_bingo_board', JSON.stringify(currentSelected));
+  localStorage.setItem('re4_bingo_source', currentSource);
   localStorage.setItem('re4_bingo_marked', JSON.stringify(markedIndices));
   localStorage.setItem('re4_bingo_selectedBy', JSON.stringify(selectedBy));
   localStorage.setItem('re4_bingo_multiplayer', JSON.stringify(isMultiplayer));
@@ -55,32 +60,51 @@ function updateStatus() {
   }
 }
 
+function updateNamesSummary() {
+  document.getElementById('playerNamesSummary').textContent =
+    `${players[1].name} vs ${players[2].name}`;
+}
+
+function autosizeInput(input) {
+  const len = Math.max(input.value.length, input.placeholder.length, 4);
+  input.style.width = (len + 2) + 'ch';
+}
+
 function syncPlayerNameInputs() {
-  document.getElementById('player1Name').value = players[1].name;
-  document.getElementById('player2Name').value = players[2].name;
+  const p1 = document.getElementById('player1Name');
+  const p2 = document.getElementById('player2Name');
+  p1.value = players[1].name;
+  p2.value = players[2].name;
+  autosizeInput(p1);
+  autosizeInput(p2);
+  updateNamesSummary();
 }
 
 function toggleMode() {
   isMultiplayer = !isMultiplayer;
   const switchPlayerBtn = document.getElementById('switchPlayer');
-  const playerNamesDiv = document.getElementById('playerNames');
+  const details = document.getElementById('playerNamesDetails');
 
   if (isMultiplayer) {
     syncPlayerNameInputs();
-    playerNamesDiv.classList.remove('hidden');
+    details.classList.remove('hidden');
+    details.setAttribute('open', '');
     switchPlayerBtn.classList.remove('hidden');
   } else {
     currentPlayer = 1;
-    playerNamesDiv.classList.add('hidden');
+    details.classList.add('hidden');
+    details.removeAttribute('open');
     switchPlayerBtn.classList.add('hidden');
     clearWinBanner();
   }
   updateStatus();
+  saveState();
 }
 
 function switchPlayer() {
   currentPlayer = currentPlayer === 1 ? 2 : 1;
   updateStatus();
+  saveState();
 }
 
 function checkWin() {
@@ -102,15 +126,13 @@ function checkWin() {
 }
 
 function clearWinBanner() {
-  const banner = document.getElementById('winBanner');
-  banner.classList.add('hidden');
+  document.getElementById('winBanner').classList.add('hidden');
   document.querySelectorAll('.bingo-tile.bingo-line').forEach(t => t.classList.remove('bingo-line'));
 }
 
 function announceWin(result) {
   const tiles = [...document.querySelectorAll('.bingo-tile')];
   result.line.forEach(i => tiles[i].classList.add('bingo-line'));
-
   const banner = document.getElementById('winBanner');
   banner.textContent = result.winner === 'solo'
     ? 'Bingo!'
@@ -119,15 +141,18 @@ function announceWin(result) {
 }
 
 function generateBoard() {
-  const source = document.getElementById('sourceSelect').value;
+  currentSource = document.getElementById('sourceSelect').value;
   const base = [...challenges.Original];
-  const pool = source === 'All' ? base.concat(challenges.ChatGPT) : base;
-  const selected = shuffle(pool).slice(0, 25);
+  const pool = currentSource === 'All' ? base.concat(challenges.ChatGPT) : base;
+  currentSelected = shuffle(pool).slice(0, 25);
   clearWinBanner();
-  renderBoard(selected, source, []);
+  renderBoard(currentSelected, currentSource, []);
 }
 
 function renderBoard(selected, source, markedIndices, selectedBy = []) {
+  currentSelected = selected;
+  currentSource = source;
+
   const board = document.getElementById('bingoBoard');
   board.innerHTML = '';
   document.getElementById('sourceSelect').value = source;
@@ -169,9 +194,7 @@ function renderBoard(selected, source, markedIndices, selectedBy = []) {
         tile.style.color = '';
       }
 
-      const marked = [...document.querySelectorAll('.bingo-tile.marked')]
-        .map(el => parseInt(el.dataset.index));
-      saveState(selected, source, marked);
+      saveState();
 
       const win = checkWin();
       if (win) announceWin(win);
@@ -180,7 +203,7 @@ function renderBoard(selected, source, markedIndices, selectedBy = []) {
     board.appendChild(tile);
   });
 
-  saveState(selected, source, markedIndices);
+  saveState();
 }
 
 document.addEventListener('keydown', e => {
@@ -197,7 +220,16 @@ document.getElementById('switchPlayer').addEventListener('click', switchPlayer);
 document.getElementById('applyNames').addEventListener('click', () => {
   players[1].name = document.getElementById('player1Name').value.trim() || 'Player 1';
   players[2].name = document.getElementById('player2Name').value.trim() || 'Player 2';
+  updateNamesSummary();
+  document.getElementById('playerNamesDetails').removeAttribute('open');
   updateStatus();
+  saveState();
+});
+
+// Auto-size inputs as the user types
+['player1Name', 'player2Name'].forEach(id => {
+  const input = document.getElementById(id);
+  input.addEventListener('input', () => autosizeInput(input));
 });
 
 window.addEventListener('load', () => {
@@ -208,13 +240,10 @@ window.addEventListener('load', () => {
     generateBoard();
   }
 
-  const switchPlayerBtn = document.getElementById('switchPlayer');
-  const playerNamesDiv = document.getElementById('playerNames');
-
   if (isMultiplayer) {
     syncPlayerNameInputs();
-    switchPlayerBtn.classList.remove('hidden');
-    playerNamesDiv.classList.remove('hidden');
+    document.getElementById('playerNamesDetails').classList.remove('hidden');
+    document.getElementById('switchPlayer').classList.remove('hidden');
   }
 
   updateStatus();

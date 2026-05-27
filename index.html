@@ -22,11 +22,14 @@
       </div>
       <div class="control-row">
         <button id="toggleMode">Solo / Multiplayer</button>
-        <div id="playerNames" class="player-names hidden">
-          <input type="text" id="player1Name" value="Player 1" maxlength="20" aria-label="Player 1 name">
-          <input type="text" id="player2Name" value="Player 2" maxlength="20" aria-label="Player 2 name">
-          <button id="applyNames">Apply</button>
-        </div>
+        <details id="playerNamesDetails" class="hidden">
+          <summary id="playerNamesSummary">Player 1 vs Player 2</summary>
+          <div class="player-names-panel">
+            <input type="text" id="player1Name" value="Player 1" maxlength="20" placeholder="Player 1" aria-label="Player 1 name">
+            <input type="text" id="player2Name" value="Player 2" maxlength="20" placeholder="Player 2" aria-label="Player 2 name">
+            <button id="applyNames">Apply</button>
+          </div>
+        </details>
         <button id="switchPlayer" class="hidden">Switch Player</button>
       </div>
       <p id="status">Solo Mode</p>
