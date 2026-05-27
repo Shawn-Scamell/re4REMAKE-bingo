@@ -3,29 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
   <title>Resident Evil 4 Bingo</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <h1>Resident Evil 4 Bingo</h1>
-  <label for="sourceSelect">Challenge Source:</label>
-  <select id="sourceSelect">
-    <option value="Original">Original Only</option>
-    <option value="All">Original + Extras</option>
-  </select>
-  <button id="regenerateBoard">Regenerate Board</button>
+  <header>
+    <h1>Resident Evil 4 Bingo</h1>
+    <div class="controls">
+      <div class="control-row">
+        <label for="sourceSelect">Source:</label>
+        <select id="sourceSelect">
+          <option value="Original">Original Only</option>
+          <option value="All">Original + Extras</option>
+        </select>
+        <button id="regenerateBoard">Regenerate</button>
+      </div>
+      <div class="control-row">
+        <button id="toggleMode">Solo / Multiplayer</button>
+        <div id="playerNames" class="player-names hidden">
+          <input type="text" id="player1Name" value="Player 1" maxlength="20" aria-label="Player 1 name">
+          <input type="text" id="player2Name" value="Player 2" maxlength="20" aria-label="Player 2 name">
+          <button id="applyNames">Apply</button>
+        </div>
+        <button id="switchPlayer" class="hidden">Switch Player</button>
+      </div>
+      <p id="status">Solo Mode</p>
+    </div>
+  </header>
 
-  <!-- Multiplayer Controls -->
-  <div id="multiplayerControls">
-    <button id="toggleMode">Toggle Solo/Multiplayer</button>
-    <p id="status">Solo Mode</p>
-    <button id="switchPlayer" style="display: none;">Switch Player</button>
-  </div>
+  <div id="winBanner" class="win-banner hidden"></div>
 
-  <div class="bingo-board" id="bingoBoard"></div>
+  <main>
+    <div class="bingo-board" id="bingoBoard"></div>
+  </main>
 
-<script type="module" src="./js/script.js"></script>
+  <script type="module" src="./js/script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./js/service-worker.js')
